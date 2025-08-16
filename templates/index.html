@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <h2>Live EEG Data</h2>
+    <div id="graph"></div>
+
+    <script>
+        var socket = io();
+        var x = [], y = [];
+        var graphDiv = document.getElementById('graph');
+
+        Plotly.newPlot(graphDiv, [{x:[], y:[], mode:'lines', line:{color:'blue'}}]);
+
+        socket.on('eeg_data', function(data) {
+            var time = new Date();
+            x.push(time);
+            y.push(data.value);
+
+            if (x.length > 200) { x.shift(); y.shift(); }
+
+            Plotly.update(graphDiv, {x:[x], y:[y]});
+        });
+    </script>
+</body>
+</html>
